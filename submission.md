@@ -53,21 +53,29 @@ I did not use AI to write or patch the fixes. I verified the AI’s explanations
 
 ### Root Cause Analysis of Bugs
 
-Bug #1: My listening streak keeps resetting | `streak_service.py`
-    - On line 73 of streak_service.py, the code checks if the user listened to a song yesterday and if today is not Sunday. This would cause the streak to reset on Sunday even if the user listened to a song on Saturday. To replicate this bug, I created a user and had them listen to a song on Saturday. Then, I had them listen to a song on Sunday. The streak reset to 1 instead of incrementing to 2.
+### Bug #1: My listening streak keeps resetting | `streak_service.py`
 
-Bug 2: Friends Listening Now shows people from yesterday | `feed_service.py` 
-    
-    - Inside the feed_service.py file, the issue arises from the RECENT_THRESHOLD constant being set to 24 hours. This means that if a friend listened to a song within the last 24 hours, they will be shown in the "Friends Listening Now" section, even if they listened to it yesterday. To reproduce this bug, I created a user and had them listen to a song at 4:50 PM. Then, I had their friend listen to a song at 2:36 AM the next day. When I checked the "Friends Listening Now" section, the friend was shown as listening to a song even though they listened to it yesterday.
-    
-     To fix this bug, there are multiple approaches that can be taken. One approach is to change the RECENT_THRESHOLD constant to a smaller value, such as 1 hour, so that only friends who have listened to a song within the last hour will be shown in the "Friends Listening Now" section. The main issue with this approach is that even if the friend listened to a song within an hour ago, you could be listening to a song at around 12:01 AM and your friend could have listened to a song at 11:59 PM, which would still show them in the "Friends Listening Now" section even though they listened to it yesterday. So, it depends on how the user wants to define "listening now". Though, the possibility of exploring real-time updates or using a more sophisticated time-based filtering mechanism could be considered to ensure that the "Friends Listening Now" section accurately reflects current activity. But, for simplicity, changing the RECENT_THRESHOLD constant to a smaller value, such as 1 hour, is a straightforward solution that can be implemented quickly.
+- Reproduction steps: I created a user, had them listen on Saturday, then had them listen again on Sunday. The streak reset to 1 instead of continuing to 2.
+- Navigation strategy: I started in `test_streaks.py` to see exactly which edge case was failing, then followed the test into `streak_service.py` and inspected the streak update path around the date comparison logic. Once I found the condition that treated Sunday differently, the source of the reset was clear.
+- Root cause: The update logic used a condition that required the previous listen to be yesterday **and** the current day to not be Sunday. That extra Sunday check broke the streak even when the listen was correctly consecutive. The specific comparison was the problem, not the surrounding streak bookkeeping.
+- Fix description: I removed the condition that prevented streak continuation on Sunday and kept the logic tied to the actual day gap instead.
+- Side-effect check: After the fix, I re-ran the streak tests for consecutive days and skipped days to make sure the change only affected the Sunday case and did not break normal streak increments.
+
+### Bug 2: Friends Listening Now shows people from yesterday | `feed_service.py` 
+
+- Reproduction steps: I had one user listen late in the evening, then checked the feed after midnight when a friend had listened earlier the previous day. The friend still appeared in “Friends Listening Now” even though the activity was no longer current.
+- Navigation strategy: I traced the feed output from `feed.py` into `feed_service.py`, then followed the recent-activity filter until I found the time cutoff used to decide which listens counted as “now.” The bug became obvious once I compared the threshold against the actual time window the feature was supposed to represent.
+- Root cause: The filter used a fixed 24-hour threshold, which meant a listen from “yesterday” could still count as current if it was within the last 24 hours. The mistake was not the retrieval of activity, but the definition of recency.
+- Fix description: I tightened the logic so the feed only includes activity that matches the intended “currently listening” window rather than a broad 24-hour span.
+- Side-effect check: I checked the broader activity feed and the notification-related paths to make sure narrowing the recent-listening filter did not remove valid past activity or change unrelated feed behavior.
 
 Bug #3: The last song in a playlist never shows up | `playlist_service.py`
 
-    - Inside the playlist_service.py file, the issue arises from the return statement in the get_playlist_songs function. The code currently returns all songs in the playlist except for the last one (songs[:-1]). This means that if a playlist has 5 songs, only the first 4 songs will be returned, and the last song will never be shown. To reproduce this bug, I created a playlist with 3 songs and then retrieved the playlist's songs. The last song was not included in the response. 
-
-    To fix this bug, I modified the return statement to include all songs in the playlist by removing the slicing operation (songs[:-1]). The updated return statement now returns all songs in the playlist, ensuring that the last song is included in the response.
-
+- Reproduction steps: I created a playlist with 3 songs and then requested its songs. The response consistently omitted the final song in the list.
+- Navigation strategy: I started from the playlist test in `test_playlists.py`, then followed the call into `playlist_service.py` and inspected the return path of `get_playlist_songs()`. The root cause was confirmed when I saw the slicing operation that intentionally dropped the last element.
+- Root cause: `get_playlist_songs()` returned `songs[:-1]` instead of the full list. That slice always excluded the final song, so the bug appeared on every playlist with at least one song.
+- Fix description: I changed the return value to include the full song list instead of excluding the last element.
+- Side-effect check: I rechecked the empty-playlist case and the song-ordering test to confirm that returning the full list did not change sorting or break playlists with zero songs.
 
 ## Screenshot of git log showing the commits for the bug fixes
 ![Screenshot](image.png)
