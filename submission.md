@@ -41,8 +41,6 @@ I did not use AI to write or patch the fixes. I verified the AI’s explanations
 1. The user listens to a song through the song/listening endpoint.
 2. The request is handled in `songs.py`, which passes the event into the listening and streak logic.
 3. `streak_service.py` records the event and updates the user’s streak.
-4. If the listening action should generate downstream activity, `notification_service.py` is used to create the relevant notification.
-5. `users.py` later exposes those notifications through the user notification endpoint.
 
 ### Patterns seen:
 
