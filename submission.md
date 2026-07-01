@@ -36,8 +36,8 @@ I did not use AI to write or patch the fixes. I verified the AI’s explanations
 
 - `app.py` is the application entry point. It initializes Flask, configures the database connection, and registers the routes.
 
-### Data Flow for creating a playlist:
-
+### Data Flow for streak updates and notifications:
+ 
 1. The user listens to a song through the song/listening endpoint.
 2. The request is handled in `songs.py`, which passes the event into the listening and streak logic.
 3. `streak_service.py` records the event and updates the user’s streak.
