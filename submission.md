@@ -1,13 +1,6 @@
 ## AI Usage
 
-    - how you used AI tools during codebase navigation and debugging
-    
-    - what they helped you understand 
-    
-    - where you verified or overrode their output
-
-
-
+    The use of AI tools during codebase navigation and debugging primarily involved asking questions about the purpose of a function and it's current logical flow. For example, I would ask the LLM something like what the return value of get_playlist_songs was and it explained to me that it was returning all songs in a playlist except for the last one. From there, I used this information to guide my debugging process and created an informed diagnostic of the issue. Due to the nature of this project, I did not use AI tools to write any code, but rather to understand the codebase and provide information that allowed me to make my own hypotheses. Any bug fixes that were conducted were done manually and not by an AI tool.
 
 ## Roles of Each Layer 
     
@@ -80,3 +73,7 @@ Bug #3: The last song in a playlist never shows up | `playlist_service.py`
     - Inside the playlist_service.py file, the issue arises from the return statement in the get_playlist_songs function. The code currently returns all songs in the playlist except for the last one (songs[:-1]). This means that if a playlist has 5 songs, only the first 4 songs will be returned, and the last song will never be shown. To reproduce this bug, I created a playlist with 3 songs and then retrieved the playlist's songs. The last song was not included in the response. 
 
     To fix this bug, I modified the return statement to include all songs in the playlist by removing the slicing operation (songs[:-1]). The updated return statement now returns all songs in the playlist, ensuring that the last song is included in the response.
+
+
+## Screenshot of git log showing the commits for the bug fixes
+![Screenshot](image.png)
