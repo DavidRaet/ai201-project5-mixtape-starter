@@ -1,6 +1,8 @@
 ## AI Usage
 
-    The use of AI tools during codebase navigation and debugging primarily involved asking questions about the purpose of a function and it's current logical flow. For example, I would ask the LLM something like what the return value of get_playlist_songs was and it explained to me that it was returning all songs in a playlist except for the last one. From there, I used this information to guide my debugging process and created an informed diagnostic of the issue. Due to the nature of this project, I did not use AI tools to write any code, but rather to understand the codebase and provide information that allowed me to make my own hypotheses. Any bug fixes that were conducted were done manually and not by an AI tool.
+I used AI tools during codebase navigation and debugging to clarify what individual functions and paths were doing before I formed my own hypotheses. For example, I asked about the behavior of `get_playlist_songs`, and the explanation helped me trace how playlist data was being returned and why one bug was happening. I also asked about the flow around streak updates and feed generation so I could compare the code’s actual control flow against the bug reports.
+
+I did not use AI to write or patch the fixes. I verified the AI’s explanations by checking the relevant files and following the calls myself, and in a few cases the AI’s first explanation was incomplete, so I had to go back to the code and narrow down the exact condition causing the bug. That back-and-forth was useful because it forced me to confirm the logic directly instead of trusting a surface-level explanation.
 
 ## Roles of Each Layer 
     
