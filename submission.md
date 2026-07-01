@@ -1,3 +1,14 @@
+## AI Usage
+
+    - how you used AI tools during codebase navigation and debugging
+    
+    - what they helped you understand 
+    
+    - where you verified or overrode their output
+
+
+
+
 ## Roles of Each Layer 
     
 ### Routes:
@@ -51,3 +62,10 @@
     - The application follows a layered architecture pattern, separating concerns into distinct layers: routes, services, and models. This promotes maintainability and scalability by allowing each layer to focus on its specific responsibilities. Additionally, because the application is structured in a modular way, it is easier to test and debug individual components without affecting the entire system. 
 
     - In almost every function, there is a form of error handling, which is important for ensuring that the application can gracefully handle situations where an action fails to complete successfully. 
+
+
+### How Each Bug was reproduced:
+
+Bug #1: My listening streak keeps resetting | `streak_service.py`
+    - On line 73 of streak_service.py, the code checks if the user listened to a song yesterday and if today is not Sunday. This would cause the streak to reset on Sunday even if the user listened to a song on Saturday. To replicate this bug, I created a user and had them listen to a song on Saturday. Then, I had them listen to a song on Sunday. The streak reset to 1 instead of incrementing to 2.
+
