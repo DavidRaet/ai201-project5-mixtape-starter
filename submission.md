@@ -41,6 +41,7 @@ I did not use AI to write or patch the fixes. I verified the AI’s explanations
 1. The user listens to a song through the song/listening endpoint.
 2. The request is handled in `songs.py`, which passes the event into the listening and streak logic.
 3. `streak_service.py` records the event and updates the user’s streak.
+4. return the listening event back to the songs/listening endpoint. 
 
 ### Patterns seen:
 
