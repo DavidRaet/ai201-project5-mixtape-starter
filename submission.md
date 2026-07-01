@@ -38,10 +38,11 @@ I did not use AI to write or patch the fixes. I verified the AI’s explanations
 
 ### Data Flow for creating a playlist:
 
-    1. The user sends a POST request to the /playlists endpoint with the necessary data to create a new playlist.
-    2. The playlists route receives the request and calls the create_playlist() function in the playlist service.
-    3. The playlist service processes the request, creates a new playlist in the database, and returns the newly created playlist's metadata.
-    4. The playlists route sends a response back to the user with the newly created playlist's metadata, if successful, or an error message if the request was invalid, as in if the user did not add in the necessary attributes needed for the playlist or an error occurred in making the playlist.
+1. The user listens to a song through the song/listening endpoint.
+2. The request is handled in `songs.py`, which passes the event into the listening and streak logic.
+3. `streak_service.py` records the event and updates the user’s streak.
+4. If the listening action should generate downstream activity, `notification_service.py` is used to create the relevant notification.
+5. `users.py` later exposes those notifications through the user notification endpoint.
 
 ### Patterns seen:
 
